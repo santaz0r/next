@@ -1,26 +1,29 @@
 import { getPostById, Post } from '@/shared/api';
 import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next';
-import { useEffect, useLayoutEffect } from 'react';
+import Head from 'next/head';
+import PostNotFound from './404';
 
-type WithCookie = {
+type ExtraProps = {
   cookies?: boolean;
+  error?: boolean;
 };
 
-const PostPage: NextPage<Post & WithCookie> = ({ post, cookies }) => {
-  useEffect(() => {
-    console.log('useEffect на клиенте. SSR не влияет.');
-  }, []);
+const PostPage: NextPage<Post & ExtraProps> = ({ post, error }) => {
+  if (error) return <PostNotFound />;
 
-  useLayoutEffect(() => {
-    console.log('useLayoutEffect: выполняется синхронно перед рендером');
-  }, []);
-  console.log(cookies);
   return (
-    <div>
-      <h2>Post page</h2>
-      <h3>{post.title}</h3>
-      <p>{post.body}</p>
-    </div>
+    <>
+      <Head>
+        <title>Post | {post.title}</title>
+      </Head>
+
+      <div>
+        <h2>Post page</h2>
+
+        <h3>{post.title}</h3>
+        <p>{post.body}</p>
+      </div>
+    </>
   );
 };
 
@@ -30,22 +33,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
   const acceptLanguage = req.headers['accept-language'] || 'unknown';
 
   console.log(acceptLanguage);
+  console.log(query);
 
-  res.setHeader('Set-Cookie', ['my-cookie=value123412; Path=/; HttpOnly; max-age=3600']);
+  res.setHeader('Set-Cookie', 'my-cookie=value123412; Path=/; HttpOnly; max-age=3600');
   res.setHeader('Content-Language', acceptLanguage);
 
   const { id } = ctx.params as { id: string };
-  // или
-  // const { id } = query
 
   const post: Post = await getPostById(id);
   const cookies = req.cookies;
-
-  // if (!query.paramName) {
-  //   res.writeHead(302, { Location: '/error' });
-  //   res.end();
-  //   return { props: {} };
-  // }
 
   if (id === 'secret') {
     return {
@@ -57,13 +53,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
   }
 
   if (!Object.keys(post).length) {
-    return {
-      notFound: true,
-    };
+    res.statusCode = 404;
+    return { props: { error: true } };
+    // return {
+    //   notFound: true,
+    // };
   }
 
   return {
-    props: { post, cookies },
+    props: { post },
   };
 };
 

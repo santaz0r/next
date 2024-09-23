@@ -1,5 +1,7 @@
 import Head from 'next/head';
+
 import styles from './home.module.scss';
+import Image from 'next/legacy/image';
 
 const Home = () => {
   return (
@@ -12,6 +14,7 @@ const Home = () => {
       </Head>
       <main className={styles.main}>
         <h1>Home page</h1>
+        <Image src="https://i.imgur.com/t7iUoMw.jpeg" alt="Дбрутр" width={500} height={300} priority />
       </main>
     </>
   );

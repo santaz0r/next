@@ -9,3 +9,10 @@ export default function App({ Component, pageProps }: AppProps) {
     </Layout>
   );
 }
+
+// App.getInitialProps = async ({ ctx }) => {
+//   const nonce = ctx.res.getHeader('x-nonce');
+//   return {
+//     nonce,
+//   };
+// };
