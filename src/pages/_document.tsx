@@ -1,11 +1,9 @@
 import { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
-import NextDocument from 'next/document';
 
-export default function Document({ nonce }) {
+export default function Document() {
   return (
     <Html lang="en">
-      <Head nonce={nonce} />
-
+      <Head />
       <body>
         <Main />
         <NextScript />
@@ -13,11 +11,3 @@ export default function Document({ nonce }) {
     </Html>
   );
 }
-
-// export const getInitialProps = async (ctx) => {
-//   const nonce = ctx.res.getHeader('x-nonce');
-//   return {
-//     ...(await NextDocument.getInitialProps(ctx)),
-//     nonce,
-//   };
-// };

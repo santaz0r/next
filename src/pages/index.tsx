@@ -2,8 +2,13 @@ import Head from 'next/head';
 
 import styles from './home.module.scss';
 import Image from 'next/legacy/image';
+import { GetServerSideProps, NextPage } from 'next';
+import { allSettled, fork, serialize } from 'effector';
+import { getTodosFx, Todos } from '@/shared/api';
+import { model } from '@/features/todos';
 
-const Home = () => {
+const Home: NextPage<Todos> = ({ todos }) => {
+  // const [todos] = useUnit([model.$todos]);
   return (
     <>
       <Head>
@@ -14,10 +19,37 @@ const Home = () => {
       </Head>
       <main className={styles.main}>
         <h1>Home page</h1>
-        <Image src="https://i.imgur.com/t7iUoMw.jpeg" alt="Дбрутр" width={500} height={300} priority />
+        <Image src="https://i.imgur.com/t7iUoMw.jpeg" alt="Дбрутр" width={30} height={30} priority />
+
+        <div className={styles.wrapper}>
+          <div className={styles.todos}>
+            {todos &&
+              todos.map((todo) => (
+                <div key={todo.id}>
+                  <h2>{todo.title}</h2>
+                  <p>{JSON.stringify(todo.completed)}</p>
+                  <br />
+                </div>
+              ))}
+          </div>
+          <div className={styles.users}></div>
+        </div>
       </main>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<Todos> = async () => {
+  const scope = fork();
+  const event = model.getTodos;
+  await allSettled(event, { scope });
+  const scopeData = serialize(scope);
+  console.log(scopeData);
+  return {
+    props: {
+      todos: [],
+    },
+  };
 };
 
 export default Home;

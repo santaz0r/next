@@ -1,3 +1,5 @@
+import { createEffect } from 'effector';
+
 type PostType = {
   id: number;
   title: string;
@@ -26,4 +28,42 @@ export const getPostById = async (id: string) => {
   return data;
 };
 
-export type { PostsType, Post };
+/// todos & users ///
+
+type Todo = {
+  id: number;
+  title: string;
+  completed: boolean;
+};
+
+type Todos = {
+  todos: Todo[];
+};
+
+type User = {
+  id: number;
+  title: string;
+  username: string;
+  email: string;
+};
+
+enum Url {
+  todos = 'https://jsonplaceholder.typicode.com/todos?_limit=7',
+  users = 'https://jsonplaceholder.typicode.com/users',
+}
+
+export const getTodosFx = createEffect(async () => {
+  const res = await fetch(Url.todos);
+
+  const data = await res.json();
+  return data;
+});
+
+export const getUsersFx = createEffect(async () => {
+  const res = await fetch(Url.users);
+
+  const data = await res.json();
+  return data;
+});
+
+export type { PostsType, Post, Todo, Todos, User };
