@@ -1,14 +1,18 @@
-import Head from 'next/head';
-
-import styles from './home.module.scss';
-import Image from 'next/legacy/image';
-import { GetServerSideProps, NextPage } from 'next';
 import { allSettled, fork, serialize } from 'effector';
-import { getTodosFx, Todos } from '@/shared/api';
-import { model } from '@/features/todos';
 
-const Home: NextPage<Todos> = ({ todos }) => {
-  // const [todos] = useUnit([model.$todos]);
+import Head from 'next/head';
+import Image from 'next/legacy/image';
+import { Todo } from '@/shared/api';
+
+import { model as todoModel, TodosList } from '@/widgets/todos';
+import { model as usersModel, UsersList } from '@/widgets/users';
+import styles from './home.module.scss';
+
+// type InitialType = {
+//   initialState: Todo[];
+// };
+
+const Home = () => {
   return (
     <>
       <Head>
@@ -22,32 +26,30 @@ const Home: NextPage<Todos> = ({ todos }) => {
         <Image src="https://i.imgur.com/t7iUoMw.jpeg" alt="Дбрутр" width={30} height={30} priority />
 
         <div className={styles.wrapper}>
-          <div className={styles.todos}>
-            {todos &&
-              todos.map((todo) => (
-                <div key={todo.id}>
-                  <h2>{todo.title}</h2>
-                  <p>{JSON.stringify(todo.completed)}</p>
-                  <br />
-                </div>
-              ))}
-          </div>
-          <div className={styles.users}></div>
+          <TodosList />
+          <UsersList />
         </div>
       </main>
     </>
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Todos> = async () => {
+export const getServerSideProps = async () => {
   const scope = fork();
-  const event = model.getTodos;
-  await allSettled(event, { scope });
+
+  await allSettled(todoModel.getTodos, {
+    scope,
+  });
+
+  await allSettled(usersModel.getUsers, {
+    scope,
+  });
+
   const scopeData = serialize(scope);
-  console.log(scopeData);
+
   return {
     props: {
-      todos: [],
+      initialState: scopeData,
     },
   };
 };

@@ -42,13 +42,17 @@ type Todos = {
 
 type User = {
   id: number;
-  title: string;
+  name: string;
   username: string;
   email: string;
 };
 
+type Users = {
+  users: User[];
+};
+
 enum Url {
-  todos = 'https://jsonplaceholder.typicode.com/todos?_limit=7',
+  todos = 'https://jsonplaceholder.typicode.com/todos?_limit=10',
   users = 'https://jsonplaceholder.typicode.com/users',
 }
 
@@ -66,4 +70,4 @@ export const getUsersFx = createEffect(async () => {
   return data;
 });
 
-export type { PostsType, Post, Todo, Todos, User };
+export type { PostsType, Post, Todo, Todos, User, Users };
